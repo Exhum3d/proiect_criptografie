@@ -1,0 +1,203 @@
+@page "/statistici"
+
+@inject NavigationManager _navManager
+@inject StatisticiService _statistici
+
+
+<MudTabs Elevation="0" Rounded="true" PanelClass="pa-6" Align="center" Position="Position.Top">
+    <MudTabPanel Text="Reprezentare tabelară">
+        <MudTable Items="@_statistici.ListaStatistici"
+                  Hover="true"
+                  Striped="true"
+                  GroupFooterClass="mb-4">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Frecvența apariției caracterelor</MudText>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Index</MudTh>
+                <MudTh>Caracter</MudTh>
+                <MudTh>Frecvență</MudTh>
+                <MudTh>Probabilitate de apariție</MudTh>
+                <MudTh>Progres (Val. Unitara)</MudTh>
+                <MudTh>Cod Huffman</MudTh>
+            </HeaderContent>
+            <GroupHeaderTemplate>
+            </GroupHeaderTemplate>
+            <RowTemplate>
+                <MudTd DataLabel="id" Class="clm-row-small">@context.ID</MudTd>
+                <MudTd DataLabel="caracter">@context.CaracterAlfabet</MudTd>
+                <MudTd DataLabel="frecventa">@context.Frecventa</MudTd>
+                <MudTd DataLabel="probabilitateDeAparitie">@context.Probabilitate</MudTd>
+                <MudTh DataLabel="progresValUnit">@context.ProgresValoareUnitara</MudTh>
+                <MudTh DataLabel="codHuffman">@context.CodHuffman</MudTh>
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager/>
+            </PagerContent>
+        </MudTable>
+        <h3 style="margin-top: 10px;">Total frecvente: @_statistici.TotalFrecvente</h3>
+    </MudTabPanel>
+    <MudTabPanel Text="Reprezentare grafică">
+        <MudChart ChartType="ChartType.Bar"
+                  ChartSeries="@Series"
+                  XAxisLabels="@_labels"
+                  Width="100%"
+                  Height="500"/>
+    </MudTabPanel>
+    <MudTabPanel Text="Proiectarea sursei informaționale">
+        <MudCard Outlined="true" Align="left">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Proiectarea sursei informaționale</MudText>
+                </CardHeaderContent>
+                <CardHeaderActions>
+                    <MudIconButton Icon="@Icons.Outlined.Info" Color="Color.Default"/>
+                </CardHeaderActions>
+            </MudCardHeader>
+            <MudCardContent Class="pb-10">
+                <MudText Typo="Typo.body2">
+                    Pentru proiectarea sursei informaționale am ales un text format din N = 50 000 de caractere.
+                </MudText>
+                <MudText Typo="Typo.body2">
+                    Numărul total de caractere distincte din alfabetul sursei este L = 31.
+                </MudText>
+                <MudText Typo="Typo.body2">
+                    Se iau in considerare doar caracterele care reprezintă litere din alfabetul român, astfel, semnele
+                    de punctuație vor fi ignorate.
+                </MudText>
+            </MudCardContent>
+        </MudCard>
+        <MudContainer Align="left" Class="pt-15">
+            <MudText Typo="Typo.h6">Modelul probabilistic al sursei</MudText>
+            <div style="width: 50%; margin-top: 20px;text-align: left;">
+                <MudTable Items="@_statistici.ListaStatistici"
+                          Hover="true"
+                          Striped="true"
+                          GroupFooterClass="mb-4"
+                          Elevation="0">
+                    <ColGroup>
+                        <col style="width: 50%;"/>
+                        <col style="width: 50%"/>
+
+                    </ColGroup>
+                    <HeaderContent>
+                        <MudTh Class="rotate-th">Caracter</MudTh>
+                        <MudTh Class="rotate-th">Probabilitate de apariție P(a)</MudTh>
+                    </HeaderContent>
+                    <GroupHeaderTemplate>
+                    </GroupHeaderTemplate>
+                    <RowTemplate>
+                        <MudTd DataLabel="caracter">@context.CaracterAlfabet</MudTd>
+                        <MudTd DataLabel="probabilitateDeAparitie">@context.Probabilitate</MudTd>
+                    </RowTemplate>
+                    <PagerContent>
+                        <MudTablePager/>
+                    </PagerContent>
+                </MudTable>
+            </div>
+        </MudContainer>
+        <MudCard Outlined="true" Align="left" Class="mb-10 mt-10">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Calculul entropiei</MudText>
+                </CardHeaderContent>
+                <CardHeaderActions>
+                    <MudIconButton Icon="@Icons.Outlined.Info" Color="Color.Default"/>
+                </CardHeaderActions>
+            </MudCardHeader>
+            <MudCardContent Class="pb-5">
+                <MudText Typo="Typo.body2">
+                    Entropia alfabetului sursei informaționale se va calcula cu formula:
+                </MudText>
+                <MudText Typo="Typo.body2" Class="mt-5">
+                    <img src="images/formula2.jpg" alt=""/>
+                </MudText>
+            </MudCardContent>
+            <h3 style="text-align:center; margin-bottom: 15px;">H(A) = @_statistici.Entropie [biti/caracter]</h3>
+        </MudCard>
+        <MudCard Outlined="true" Align="left" Class="mb-10 mt-10">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Teorema lui Shannon</MudText>
+                </CardHeaderContent>
+                <CardHeaderActions>
+                    <MudIconButton Icon="@Icons.Outlined.Info" Color="Color.Default"/>
+                </CardHeaderActions>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudText Typo="Typo.body2" Class="mt-5">
+                    Formula pentru verificarea primei formule a lui Shannon este urmatoarea:
+                </MudText>
+                <MudText Typo="Typo.body2" Class="mt-5">
+                    <img src="images/formula3.jpg" alt="">
+                </MudText>
+                <MudText Typo="Typo.body2" Class="mt-5">
+                    unde:
+                </MudText>
+                <MudItem xs="12" md="6">
+                    <MudPaper Width="100%" Elevation="0">
+                        <MudList Clickable="false" Dense="true" DisableGutters="true">
+                            <MudListItem Icon="@Icons.Filled.ArrowRight" IconColor="Color.Primary">H(A) = @_statistici.Entropie</MudListItem>
+                            <MudListItem Icon="@Icons.Filled.ArrowRight" IconColor="Color.Primary">M = 2 (in urma folosirii codului binar)</MudListItem>
+                            <MudListItem Icon="@Icons.Filled.ArrowRight" IconColor="Color.Primary">lungimea medie a combinatiilor de cod = @_statistici.LungimeMedie</MudListItem>
+                            <MudListItem Icon="@Icons.Filled.ArrowRight" IconColor="Color.Primary">eficienta = @_statistici.Eficienta</MudListItem>
+                            <MudListItem Icon="@Icons.Filled.ArrowRight" IconColor="Color.Primary">redundanta = @_statistici.Redundanta</MudListItem>
+                        </MudList>
+                    </MudPaper>
+                </MudItem>
+                <h3 style="text-align:center; margin-bottom: 15px;">@_statistici.Entropie &le; @_statistici.LungimeMedie &lt; @(_statistici.Entropie + 1)</h3>
+            </MudCardContent>
+        </MudCard>
+    </MudTabPanel>
+</MudTabs>
+
+@code {
+
+    private List<ChartSeries> Series = new();
+
+    private string[] _labels =
+    {
+        "a", "ă", "â", "b", "c", "d", "e", "f", "g", "h", "i", "î", "j", "k", "l",
+        "m", "n", "o", "p", "q", "r", "s", "ș", "t", "ț", "u", "v", "w", "x", "y", "z"
+    };
+
+    protected override void OnInitialized()
+    {
+        if (_statistici.Entropie == 0)
+        {
+            _navManager.NavigateTo("/");
+            return;
+        }
+        try
+        {
+            Series.Add(new ChartSeries()
+            {
+                Name = "Frecvența apariției caracterelor din alfabetul român, în procente",
+                Data = new[]
+                {
+                    (_statistici.ListaStatistici[0].Probabilitate * 100), (_statistici.ListaStatistici[1].Probabilitate * 100),
+                    _statistici.ListaStatistici[2].Probabilitate * 100, _statistici.ListaStatistici[3].Probabilitate * 100,
+                    _statistici.ListaStatistici[4].Probabilitate * 100, _statistici.ListaStatistici[5].Probabilitate * 100,
+                    _statistici.ListaStatistici[6].Probabilitate * 100, _statistici.ListaStatistici[7].Probabilitate * 100,
+                    _statistici.ListaStatistici[8].Probabilitate * 100, _statistici.ListaStatistici[9].Probabilitate * 100,
+                    _statistici.ListaStatistici[10].Probabilitate * 100, _statistici.ListaStatistici[11].Probabilitate * 100,
+                    _statistici.ListaStatistici[12].Probabilitate * 100, _statistici.ListaStatistici[13].Probabilitate * 100,
+                    _statistici.ListaStatistici[14].Probabilitate * 100, _statistici.ListaStatistici[15].Probabilitate * 100,
+                    _statistici.ListaStatistici[16].Probabilitate * 100, _statistici.ListaStatistici[17].Probabilitate * 100,
+                    _statistici.ListaStatistici[18].Probabilitate * 100, _statistici.ListaStatistici[19].Probabilitate * 100,
+                    _statistici.ListaStatistici[20].Probabilitate * 100, _statistici.ListaStatistici[21].Probabilitate * 100,
+                    _statistici.ListaStatistici[22].Probabilitate * 100, _statistici.ListaStatistici[23].Probabilitate * 100,
+                    _statistici.ListaStatistici[24].Probabilitate * 100, _statistici.ListaStatistici[25].Probabilitate * 100,
+                    _statistici.ListaStatistici[26].Probabilitate * 100, _statistici.ListaStatistici[27].Probabilitate * 100,
+                    _statistici.ListaStatistici[28].Probabilitate * 100, _statistici.ListaStatistici[29].Probabilitate * 100,
+                    _statistici.ListaStatistici[30].Probabilitate * 100
+                }
+            });
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+    }
+
+}

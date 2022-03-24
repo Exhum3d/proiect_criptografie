@@ -1,0 +1,273 @@
+@page "/polybius"
+@using System.Text.RegularExpressions
+
+<PageTitle>Polybius</PageTitle>
+<MudTabs Elevation="0" Rounded="true" PanelClass="pa-6" Align="center">
+    <MudTabPanel Text="Criptare">
+        <MudGrid>
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string" @bind-Value="_mesajTab1"
+                              Label="Introduceți mesajul"
+                              Variant="Variant.Outlined" Lines="10" @onfocus="AfisareMatrice"/>
+                <MudCard Width="100%" Elevation="25" Height="260px" Class="mt-10" Style="overflow-y: scroll; text-align: left;">
+                    <MudCardHeader>
+                        <MudText Typo="Typo.body1">Rezultatul criptării</MudText>
+                    </MudCardHeader>
+                    <MudDivider/>
+                    <MudCardContent Class="align-content-start" Style="overflow-wrap: break-word">
+                        <MudText>@_mesajCriptatTab1</MudText>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <div style="" class="pt-5 container-matrice-animatie @_slideDown">
+                    <MudGrid Justify="Justify.FlexStart" style="border-radius:8px;" Class="mud-theme-primary">
+                        <MudItem xs="1">
+                            @for (int i = 0; i < 6; i++)
+                            {
+                                var el = i;
+                                var expresie = el == 0 ? "padding-el-0" : "padding-el-curent";
+                                <MudItem >
+                                    <MudText Class="@expresie">@el</MudText>
+                                </MudItem>
+                            }
+                        </MudItem>
+                        <MudItem xs="11">
+                            <MudGrid Justify="Justify.FlexStart" style="border-radius:8px;" Class="pb-2 mud-theme-primary">
+                                @for (int i = 0; i < 6; i++)
+                                {
+                                    var linie = i;
+                                    <MudItem xs="2">
+                                        <MudText>@linie</MudText>
+                                    </MudItem>
+                                }
+                                @for (int i = 0; i < 6; i++)
+                                {
+                                    var linie = i;
+                                    for (int j = 0; j < 6; j++)
+                                    {
+                                        AfisareAlfabetCod();
+                                        var coloana = j;
+                                        var expresie = linie * 6 + coloana;
+
+                                        var caracterAfisat = expresie < _alfabetTab1Procesat.Length ? _alfabetTab1Procesat[expresie] : '-';
+
+                                        <MudItem xs="2">
+                                            <MudPaper Height="30px" Width="30px" Class="d-flex align-content-center justify-center">
+                                                <MudText Class="mt-1">@caracterAfisat</MudText>
+                                            </MudPaper>
+                                        </MudItem>
+                                    }
+                                }
+                            </MudGrid>
+                        </MudItem>
+                    </MudGrid>
+                </div>
+                <div class="container-in ">
+                    <MudTextField Label="Cheia de criptare"
+                                  Class="pt-5 px-15" 
+                                  @bind-Value="_cheieCriptare"
+                                  @onfocus="AfisareMatrice"/>
+                    <MudTextField Label="Precizati alfabetul dorit"
+                                  Class="pt-5 px-15"
+                                  Required="true" @bind-Value="_alfabetCriptare"/>
+                </div>
+            </MudItem>
+            <MudItem xs="12">
+                <div class="d-flex align-center justify-space-between mt-10">
+
+                    <MudButton Variant="Variant.Filled"
+                               EndIcon="@Icons.Material.Filled.Send"
+                               Color="Color.Primary"
+                               @onclick="Criptare"
+                               Class="butoane">
+                                
+                        Criptează mesajul
+                    </MudButton>
+
+                    <MudButton Variant="Variant.Filled"
+                               StartIcon="@Icons.Custom.Uncategorized.Radioactive"
+                               Color="Color.Secondary"
+                               Class="mr-15 butoane"
+                               @onclick="ResetareAfisareMatrice">
+                        Resetează câmpurile
+                    </MudButton>
+                </div>
+            </MudItem>
+        </MudGrid>
+    </MudTabPanel>
+    <MudTabPanel Text="Decriptare">
+        <MudGrid>
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string" @bind-Value="_mesajTab2"
+                              Label="Introduceți mesajul"
+                              Variant="Variant.Outlined" Lines="10" @onfocus="AfisareMatrice"/>
+                <MudCard Width="100%" Elevation="25" Height="260px" Class="mt-10" Style="overflow-y: scroll; text-align: left;">
+                    <MudCardHeader>
+                        <MudText Typo="Typo.body1">Rezultatul decriptării</MudText>
+                    </MudCardHeader>
+                    <MudDivider/>
+                    <MudCardContent Class="align-content-start" Style="overflow-wrap: break-word">
+                        <MudText>@_mesajDecriptatTab2</MudText>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <div style="" class="pt-5 container-matrice-animatie @_slideDown">
+                    <MudGrid Justify="Justify.FlexStart" style="border-radius:8px;" Class="mud-theme-primary">
+                        <MudItem xs="1">
+                            @for (int i = 0; i < 6; i++)
+                            {
+                                var el = i;
+                                var expresie = el == 0 ? "padding-el-0" : "padding-el-curent";
+                                <MudItem >
+                                    <MudText Class="@expresie">@el</MudText>
+                                </MudItem>
+                            }
+                        </MudItem>
+                        <MudItem xs="11">
+                            <MudGrid Justify="Justify.FlexStart" style="border-radius:8px;" Class="pb-2 mud-theme-primary">
+                                @for (int i = 0; i < 6; i++)
+                                {
+                                    var linie = i;
+                                    <MudItem xs="2">
+                                        <MudText>@linie</MudText>
+                                    </MudItem>
+                                }
+                                @for (int i = 0; i < 6; i++)
+                                {
+                                    AfisareAlfabetCod();
+                                    var linie = i;
+                                    for (int j = 0; j < 6; j++)
+                                    {
+                                        var coloana = j;
+                                        var expresie = linie * 6 + coloana;
+
+                                        var caracterAfisat = expresie < _alfabetTab2Procesat.Length ? _alfabetTab2Procesat[expresie] : '-';
+
+                                        <MudItem xs="2">
+                                            <MudPaper Height="30px" Width="30px" Class="d-flex align-content-center justify-center">
+                                                <MudText Class="mt-1">@caracterAfisat</MudText>
+                                            </MudPaper>
+                                        </MudItem>
+                                    }
+                                }
+                            </MudGrid>
+                        </MudItem>
+                    </MudGrid>
+                </div>
+                <div class="container-in ">
+                    <MudTextField Label="Cheia de decriptare"
+                                  Class="pt-5 px-15 " 
+                                  @bind-Value="_cheieDecriptare"
+                                  @onfocus="AfisareMatrice"/>
+                    <MudTextField Label="Precizati alfabetul dorit"
+                                  Class="pt-5 px-15"
+                                  Required="true" @bind-Value="_alfabetDecriptare"/>
+                </div>
+            </MudItem>
+            <MudItem xs="12">
+                <div class="d-flex align-center justify-space-between mt-10">
+
+                    <MudButton Variant="Variant.Filled"
+                               EndIcon="@Icons.Material.Filled.Send"
+                               Color="Color.Primary"
+                               Class="butoane"
+                               @onclick="Decriptare">
+                        Decriptează mesajul
+                    </MudButton>
+
+                    <MudButton Variant="Variant.Filled"
+                               StartIcon="@Icons.Custom.Uncategorized.Radioactive"
+                               Color="Color.Secondary"
+                               Class="mr-15 butoane"
+                               @onclick="ResetareAfisareMatrice">
+                        Resetează câmpurile
+                    </MudButton>
+                </div>
+            </MudItem>
+        </MudGrid>
+    </MudTabPanel>
+</MudTabs>
+
+@code {
+    private string _alfabetCriptare = "AĂÂBCDEFGHIÎJKLMNOPQRSȘTȚUVWXYZ";
+    private string _alfabetDecriptare = "AĂÂBCDEFGHIÎJKLMNOPQRSȘTȚUVWXYZ";
+    private string _mesajTab1 = string.Empty;
+    private string _mesajCriptatTab1 = string.Empty;
+    private string _mesajTab2 = string.Empty;
+    private string _mesajDecriptatTab2 = string.Empty;
+    private string _alfabetTab1Procesat = string.Empty;
+    private string _alfabetTab2Procesat = string.Empty;
+    private string _cheieCriptare = string.Empty;
+    private string _cheieDecriptare = string.Empty;
+    private string _slideDown = string.Empty;
+
+    private void AfisareAlfabetCod()
+    {
+        var hashCriptare = new HashSet<char>(_cheieCriptare.ToUpper() + _alfabetCriptare);
+        var hashDecriptare = new HashSet<char>(_cheieDecriptare.ToUpper() + _alfabetDecriptare);
+        _alfabetTab1Procesat = Regex.Replace(string.Join("", hashCriptare), @"\s+", "");
+        _alfabetTab2Procesat = Regex.Replace(string.Join("", hashDecriptare), @"\s+", "");
+    }
+
+    private void Criptare()
+    {
+        AfisareMatrice();
+        AfisareAlfabetCod();
+        _mesajTab1 = _mesajTab1.ToUpper();
+        _mesajCriptatTab1 = "";
+
+        foreach (var caracter in _mesajTab1)
+        {
+            if (caracter == '-')
+                continue;
+            var index = _alfabetTab1Procesat.IndexOf(caracter);
+            var i = index / 6;
+            var j = index % 6;
+            if (char.IsLetter(caracter))
+                _mesajCriptatTab1 += "" + i + j + " ";
+            else
+            {
+                _mesajCriptatTab1 += "" + (_alfabetTab1Procesat.IndexOf('Q') / 6) + (_alfabetTab1Procesat.IndexOf('Q') % 6) + " ";
+            }
+        }
+    }
+
+    private void AfisareMatrice()
+    {
+        _slideDown = "slideDown";
+    }
+
+    private void ResetareAfisareMatrice()
+    {
+        _mesajTab1 = "";
+        _mesajCriptatTab1 = "";
+        _slideDown = "";
+    }
+
+    private void Decriptare()
+    {
+        AfisareMatrice();
+        AfisareAlfabetCod();
+        _mesajDecriptatTab2 = "";
+
+        string[] temp = _mesajTab2.Split(" ");
+
+        foreach (var cuvant in temp)
+        {
+            if (cuvant.Contains('-'))
+                continue;
+            var i = cuvant[0] - 48;
+            var j = cuvant[1] - 48;
+            var expresie = i * 6 + j;
+
+            char litera = ' ';
+            if (expresie < 31)
+            {
+                _mesajDecriptatTab2 += "" + _alfabetTab2Procesat[expresie];
+            }
+        }
+    }
+
+}

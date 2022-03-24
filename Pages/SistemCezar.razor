@@ -1,0 +1,205 @@
+@page "/caesar"
+@inject NavigationManager _navManager
+
+<PageTitle>Caesar</PageTitle>
+<MudTabs Elevation="0" Rounded="true" PanelClass="pa-6 " Align="center">
+    <MudTabPanel Text="Criptare">
+        <MudGrid>
+            <MudItem xs="12" sm="6">
+                <MudTextField @bind-Value="_mesaj"
+                              Label="Introduceți mesajul"
+                              Variant="Variant.Outlined" Lines="25"
+                              Required="true"
+                              Style="text-transform:uppercase;"/>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                @if (_mesaj.Any())
+                {
+                    <div class="container-rezultat @_slideDown">
+                        <MudCard Width="100%" Elevation="25" Height="360px" Style="overflow-y: scroll; text-align: left;">
+                            <MudCardHeader>
+                                <MudText Typo="Typo.body1">Rezultatul criptării</MudText>
+                            </MudCardHeader>
+                            <MudDivider/>
+                            <MudCardContent Class="align-content-start">
+                                <MudText>@_mesajCriptat</MudText>
+                            </MudCardContent>
+                        </MudCard>
+                    </div>
+                }
+                <MudTextField Label="Precizati alfabetul dorit"
+                              Class="pt-5"
+                              Required="true" @bind-Value="_alfabetCriptare"/>
+                <MudTextField Label="Offset"
+                              Class="pt-5"
+                              Required="true" @bind-Value="_cheieCriptare"/>
+
+            </MudItem>
+        </MudGrid>
+
+        <div class="d-flex align-center justify-space-between mt-10">
+            <MudButton Variant="Variant.Filled"
+                       EndIcon="@Icons.Material.Filled.Send"
+                       Color="Color.Primary"
+                       @onclick="Criptare">
+                Criptează mesajul
+            </MudButton>
+
+            <MudButton Variant="Variant.Filled"
+                       StartIcon="@Icons.Custom.Uncategorized.Radioactive"
+                       Color="Color.Secondary"
+                       @onclick="ResetareCampuri">
+                Resetează câmpurile
+            </MudButton>
+        </div>
+    </MudTabPanel>
+    <MudTabPanel Text="Decriptare">
+        <MudGrid>
+            <MudItem xs="12" sm="6">
+                <MudTextField @bind-Value="_mesajTab2"
+                              Label="Introduceți mesajul"
+                              Variant="Variant.Outlined" Lines="25"
+                              Required="true"/>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <div class="container-rezultat @_slideDown">
+                    <MudCard Width="100%" Elevation="25" Height="360px" Style="overflow-y: scroll; text-align: left;">
+                        <MudCardHeader>
+                            <MudText Typo="Typo.body1">Rezultatul decriptării</MudText>
+                        </MudCardHeader>
+                        <MudDivider/>
+                        <MudCardContent Class="align-content-start">
+                            <MudText>@_mesajDecriptat</MudText>
+                        </MudCardContent>
+                    </MudCard>
+                </div>
+                <MudTextField Label="Precizati alfabetul dorit"
+                              Class="pt-5"
+                              Required="true" @bind-Value="_alfabetDecriptare"/>
+                <MudTextField Label="Offset"
+                              Class="pt-5"
+                              Required="true" @bind-Value="_cheieDecriptare"/>
+            </MudItem>
+        </MudGrid>
+
+        <div class="d-flex align-center justify-space-between mt-10">
+            <MudButton Variant="Variant.Filled"
+                       EndIcon="@Icons.Material.Filled.Send"
+                       Color="Color.Primary"
+                       @onclick="Decriptare">
+                Decriptează mesajul
+            </MudButton>
+            <MudButton Variant="Variant.Filled"
+                       StartIcon="@Icons.Custom.Uncategorized.Radioactive"
+                       Color="Color.Secondary"
+                       @onclick="ResetareCampuri">
+                Resetează câmpurile
+            </MudButton>
+        </div>
+    </MudTabPanel>
+    @* <MudTabPanel Text="Despre Caesar"> *@
+    @*     <MudPaper Elevation="1" style="text-align:justify;" Class="pa-10"> *@
+    @*         <MudText Typo="Typo.h6">Ce este un sistem de criptare Caesar?</MudText> *@
+    @*         <MudText Typo="Typo.body1" Class="mt-5"> *@
+    @*             Sistemul Caesar este un sistem de criptare monoalfabetic, în care fiecare litera a mesajului *@
+    @*             ce urmează a fi criptat este inlocuita cu o alta litera, localizată la o distanță determinata de valoarea decalajului ales. *@
+    @*         </MudText> *@
+    @*         <MudText Typo="Typo.h6" Class="mt-10">Cum se realizează criptarea?</MudText> *@
+    @*         <MudText Typo="Typo.body1" Class="mt-5"> *@
+    @*             Criptarea cu ajutorul codului Caesar se bazeaza pe o shiftare a alfabetului. Cel mai uzual decalaj folosit are valoarea 3. *@
+    @*         </MudText> *@
+    @*         <MudText Typo="Typo.body1" Class="mt-5">Formula matematica: CaracterCriptat = (Caracter + Offset) % LungimeAlfabet</MudText> *@
+    @*     </MudPaper> *@
+    @* </MudTabPanel> *@
+
+
+</MudTabs>
+
+
+@code {
+    private string _mesaj = string.Empty;
+    private string _mesajTab2 = string.Empty;
+    private string _mesajCriptat = string.Empty;
+    private string _mesajDecriptat = string.Empty;
+    private static string _slideDown = string.Empty;
+    private string _alfabetCriptare = "AĂÂBCDEFGHIÎJKLMNOPQRSȘTȚUVWXYZ";
+    private uint _cheieCriptare;
+    private string _alfabetDecriptare = "AĂÂBCDEFGHIÎJKLMNOPQRSȘTȚUVWXYZ";
+    private uint _cheieDecriptare;
+
+    private char CifruCriptare(char caracter)
+    {
+        if (!char.IsLetter(caracter))
+        {
+            return caracter;
+        }
+        int indexCaracter = _alfabetCriptare.IndexOf(char.ToUpper(caracter));
+        return _alfabetCriptare[(int) (indexCaracter + _cheieCriptare) % _alfabetCriptare.Length];
+    }
+
+    private char CifruDecriptare(char caracter)
+    {
+        if (!char.IsLetter(caracter))
+        {
+            return caracter;
+        }
+        int indexCaracter = _alfabetCriptare.IndexOf(char.ToUpper(caracter));
+        if (indexCaracter < _cheieDecriptare)
+        {
+            return _alfabetCriptare[(int) (_alfabetCriptare.Length - ((Math.Abs(indexCaracter - _cheieDecriptare)) % _alfabetDecriptare.Length)) % _alfabetDecriptare.Length];
+        }
+        return _alfabetDecriptare[(int) (Math.Abs(indexCaracter - _cheieDecriptare)) % _alfabetDecriptare.Length];
+    }
+
+    private void Criptare()
+    {
+        _mesajCriptat = string.Empty;
+
+        ResetareAnimatie();
+        if (_mesaj.Any())
+        {
+            foreach (char caracter in _mesaj)
+            {
+                _mesajCriptat += CifruCriptare(caracter);
+            }
+            AnimatieSlideDown();
+        }
+    }
+
+    private void Decriptare()
+    {
+        _mesajDecriptat = "";
+        ResetareAnimatie();
+
+        if (_mesajTab2.Any())
+        {
+            foreach (char caracter in _mesajTab2)
+            {
+                _mesajDecriptat += CifruDecriptare(caracter);
+            }
+            AnimatieSlideDown();
+        }
+    }
+
+    public void AnimatieSlideDown()
+    {
+        _slideDown = "slideDown";
+    }
+
+    public void ResetareAnimatie()
+    {
+        if (!_mesaj.Any())
+            _slideDown = "";
+    }
+
+    public void ResetareCampuri()
+    {
+        ResetareAnimatie();
+        _mesaj = "";
+        _mesajCriptat = "";
+        _mesajTab2 = "";
+        _mesajDecriptat = "";
+        _cheieCriptare = 0;
+        _cheieDecriptare = 0;
+    }
+}

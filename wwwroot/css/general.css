@@ -1,0 +1,97 @@
+.container-matrice-animatie {
+    width: 400px;
+    max-height: 0;
+    visibility: hidden;
+
+}
+
+.container-matrice {
+    width: 400px;
+    max-height: 400px;
+
+}
+
+.container-rezultat{
+    max-height: 0;
+    visibility:hidden;
+}
+
+.slideDown {
+
+    animation-name: slideDown;
+    -webkit-animation-name: slideDown;
+
+    animation-duration: 1s;
+    -webkit-animation-duration: 1s;
+    animation-timing-function: ease;
+    -webkit-animation-timing-function: ease;
+    max-height: 400px;
+    visibility: visible;
+}
+
+@keyframes slideDown {
+    0% {
+        transform: translateY(-100%);
+    }
+    50% {
+        transform: translateY(8%);
+    }
+    65% {
+        transform: translateY(-4%);
+    }
+    80% {
+        transform: translateY(4%);
+    }
+    95% {
+        transform: translateY(-2%);
+    }
+    100% {
+        transform: translateY(0%);
+    }
+}
+
+@-webkit-keyframes slideDown {
+    0% {
+        -webkit-transform: translateY(-100%);
+    }
+    50% {
+        -webkit-transform: translateY(8%);
+    }
+    65% {
+        -webkit-transform: translateY(-4%);
+    }
+    80% {
+        -webkit-transform: translateY(4%);
+    }
+    95% {
+        -webkit-transform: translateY(-2%);
+    }
+    100% {
+        -webkit-transform: translateY(0%);
+    }
+}
+
+.padding-el-0 {
+    padding-top: 50px;
+}
+
+.padding-el-curent {
+    padding-top: 30px;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.neselectabil {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+  
+}
+
+@media screen and (max-width: 600px){
+    .butoane{
+        margin-right:0px !important;
+    }
+}

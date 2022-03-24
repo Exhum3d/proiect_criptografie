@@ -1,0 +1,231 @@
+@page "/afin"
+
+<PageTitle>Afin</PageTitle>
+<MudTabs Elevation="0" Rounded="true" PanelClass="pa-6" Align="center">
+    <MudTabPanel Text="Criptare">
+        <MudGrid>
+            <MudItem xs="12" sm="6">
+                <MudTextField @bind-Value="_mesaj"
+                              Label="Introduceți mesajul"
+                              Variant="Variant.Outlined" Lines="25"
+                              Required="true"/>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <div class="container-rezultat @_slideDown">
+                    <MudCard Width="100%" Elevation="25" Height="300px" Style="overflow-y: scroll; text-align: left;">
+                        <MudCardHeader>
+                            <MudText Typo="Typo.body1">Rezultatul criptării</MudText>
+                        </MudCardHeader>
+                        <MudDivider/>
+                        <MudCardContent Class="align-content-start">
+                            <MudText>@_mesajCriptat</MudText>
+                        </MudCardContent>
+                    </MudCard>
+                </div>
+                <MudTextField Label="Precizati alfabetul dorit"
+                              Class="pt-5"
+                              Required="true" @bind-Value="_alfabetCriptare"/>
+                <MudTextField Label="Coeficientul A"
+                              Class="pt-5"
+                              Required="true" @bind-Value="_coeficientCriptareA"/>
+                <MudTextField Label="Coeficientul B"
+                              Class="pt-5"
+                              Required="true" @bind-Value="_coeficientCriptareB"/>
+            </MudItem>
+        </MudGrid>
+
+        <div class="d-flex align-center justify-space-between mt-10">
+            <MudButton Variant="Variant.Filled"
+                       EndIcon="@Icons.Material.Filled.Send"
+                       Color="Color.Primary"
+                       @onclick="Criptare">
+                Criptează mesajul
+            </MudButton>
+            <MudButton Variant="Variant.Filled"
+                       StartIcon="@Icons.Custom.Uncategorized.Radioactive"
+                       Color="Color.Secondary"
+                       Class="ml-auto"
+                       @onclick="ResetareCampuri">
+                Resetează câmpurile
+            </MudButton>
+        </div>
+
+    </MudTabPanel>
+    <MudTabPanel Text="Decriptare">
+        <MudGrid>
+            <MudItem xs="12" sm="6">
+                <MudTextField @bind-Value="_mesajTab2"
+                              Label="Introduceți mesajul"
+                              Variant="Variant.Outlined" Lines="25"
+                              Required="true"/>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <div class="container-rezultat @_slideDown">
+                    <MudCard Width="100%" Elevation="25" Height="300px" Style="overflow-y: scroll;text-align: left">
+                        <MudCardHeader>
+                            <MudText Typo="Typo.body1">Rezultatul decriptării</MudText>
+                        </MudCardHeader>
+                        <MudDivider/>
+                        <MudCardContent Class="align-content-start">
+                            <MudText>@_mesajDecriptat</MudText>
+                        </MudCardContent>
+                    </MudCard>
+                </div>
+                <MudTextField Label="Precizati alfabetul dorit"
+                              Class="pt-5"
+                              Required="true" @bind-Value="_alfabetDecriptare"/>
+                <MudTextField Label="Coeficientul A"
+                              Class="pt-5"
+                              Required="true" @bind-Value="_coeficientDecriptareA"/>
+                <MudTextField Label="Coeficientul B"
+                              Class="pt-5"
+                              Required="true" @bind-Value="_coeficientDecriptareB"/>
+            </MudItem>
+        </MudGrid>
+
+        <div class="d-flex align-center justify-space-between mt-10">
+            <MudButton Variant="Variant.Filled"
+                       EndIcon="@Icons.Material.Filled.Send"
+                       Color="Color.Primary"
+                       @onclick="Decriptare">
+                Decriptează mesajul
+            </MudButton>
+            <MudButton Variant="Variant.Filled"
+                       StartIcon="@Icons.Custom.Uncategorized.Radioactive"
+                       Color="Color.Secondary"
+                       Class="ml-auto"
+                       @onclick="ResetareCampuri">
+                Resetează câmpurile
+            </MudButton>
+        </div>
+    </MudTabPanel>
+</MudTabs>
+
+@code {
+    private string _mesaj = string.Empty;
+    private string _mesajCriptat = string.Empty;
+    private string _mesajDecriptat = string.Empty;
+    private string _mesajTab1 = string.Empty;
+    private string _mesajTab2 = string.Empty;
+    private string _alfabetCriptare = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private uint _coeficientCriptareA = 1;
+    private uint _coeficientCriptareB = 1;
+    private string _alfabetDecriptare = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private uint _coeficientDecriptareA = 1;
+    private uint _coeficientDecriptareB = 1;
+    private string _slideDown = "";
+
+
+    private char CifruCriptare(char caracter)
+    {
+        int suntCoprime = GetCoprime((int) _coeficientCriptareA, _alfabetCriptare.Length);
+        if (!char.IsLetter(caracter))
+        {
+            return caracter;
+        }
+        if (suntCoprime != 1)
+            return '\0';
+        int indexCaracter = _alfabetCriptare.IndexOf(char.ToUpper(caracter));
+        return _alfabetCriptare[(int) (_coeficientCriptareA * indexCaracter + _coeficientCriptareB) % _alfabetCriptare.Length];
+    }
+
+    private int CalculInversaModulara(int a, int b)
+    {
+        a = a % b;
+        for (int i = 1; i < b; i++)
+        {
+            if ((a * i) % b == 1)
+                return i;
+        }
+        return 1;
+    }
+
+    public static int GetCoprime(int val1, int val2)
+    {
+        while (val1 != 0 && val2 != 0)
+        {
+            if (val1 > val2)
+                val1 %= val2;
+            else
+                val2 %= val1;
+        }
+        return Math.Max(val1, val2);
+    }
+
+    private char CifruDecriptare(char caracter)
+    {
+        if (!char.IsLetter(caracter))
+        {
+            return caracter;
+        }
+        int indexCaracter = _alfabetCriptare.IndexOf(char.ToUpper(caracter));
+        int InversaCoefA = CalculInversaModulara((int) _coeficientDecriptareA, _alfabetDecriptare.Length);
+        if (indexCaracter < _coeficientDecriptareB)
+        {
+            return _alfabetCriptare[(int) (_alfabetCriptare.Length - (InversaCoefA * (Math.Abs(indexCaracter - _coeficientDecriptareB)) % _alfabetCriptare.Length)) % _alfabetCriptare.Length];
+        }
+        return _alfabetCriptare[(int) (InversaCoefA * (indexCaracter - _coeficientDecriptareB)) % _alfabetCriptare.Length];
+    }
+
+    public static bool IsEmptyOrWhiteSpace(string value) =>
+        value.All(char.IsWhiteSpace);
+
+    private void Criptare()
+    {
+        _mesajCriptat = string.Empty;
+
+        ResetareAnimatie();
+        if (_mesaj.Any())
+        {
+            foreach (char caracter in _mesaj)
+            {
+                _mesajCriptat += CifruCriptare(caracter);
+            }
+            if (IsEmptyOrWhiteSpace(_mesajCriptat) || _mesajCriptat[0] == '\0')
+                _mesajCriptat = "Coeficientul A nu este coprim cu lungimea alfabetului ales!!! \n" +
+                                " Asta înseamnă că substituția nu este unică (mai multe litere corespund aceleiași)\n" +
+                                "Vă rugăm alegeți alt coeficient!";
+            AnimatieSlideDown();
+        }
+    }
+
+    private void Decriptare()
+    {
+        _mesajDecriptat = "";
+        ResetareAnimatie();
+
+        if (_mesajTab2.Any())
+        {
+            foreach (char caracter in _mesajTab2)
+            {
+                _mesajDecriptat += CifruDecriptare(caracter);
+            }
+            AnimatieSlideDown();
+        }
+    }
+
+    public void AnimatieSlideDown()
+    {
+        _slideDown = "slideDown";
+    }
+
+    public void ResetareAnimatie()
+    {
+        if (!_mesaj.Any())
+            _slideDown = "";
+    }
+
+    public void ResetareCampuri()
+    {
+        ResetareAnimatie();
+        _mesaj = "";
+        _mesajCriptat = "";
+        _mesajTab2 = "";
+        _mesajDecriptat = "";
+        _coeficientCriptareA = 1;
+        _coeficientCriptareB = 1;
+        _coeficientDecriptareA = 1;
+        _coeficientDecriptareB = 1;
+    }
+
+}

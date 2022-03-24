@@ -1,0 +1,72 @@
+@page "/"
+
+@inject StatisticiService Statistici
+@inject NavigationManager NavManager
+
+<PageTitle>Frecventa Caractere</PageTitle>
+
+<MudCard Outlined="true">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">Cerința</MudText>
+        </CardHeaderContent>
+        <CardHeaderActions>
+            <MudIconButton Icon="@Icons.Outlined.Info" Color="Color.Default"/>
+        </CardHeaderActions>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudText Typo="Typo.body2">
+            Se va introduce un text de minim 50 000 de caractere (ideal 100 000 de caractere),
+            pentru ca analiza frecvenței apariției caracterelor sa aibă valoare statistică.
+        </MudText>
+        <MudText Typo="Typo.body2">
+            Caracterele analizate vor fi literele specifice alfabetului român,
+            neținându-se cont de semnele de punctuație.
+        </MudText>
+    </MudCardContent>
+    <MudCardActions>
+        <MudButton Variant="Variant.Text" Color="Color.Primary">Citește mai mult</MudButton>
+    </MudCardActions>
+</MudCard>
+
+<MudForm  Class="mt-15" Elevation="0">
+    <MudTextField @bind-Value="_mesaj"
+                  Label="Introduceți textul pe care doriți să-l analizați"
+                  Variant="Variant.Outlined" Lines="15"
+                  Required="true"/>
+    <div class="d-flex align-center justify-space-between mt-10">
+        <MudButton Variant="Variant.Filled"
+                   EndIcon="@Icons.Material.Filled.Send"
+                   Color="Color.Primary"
+                   @onclick="ObtinereStatistici">
+            Obține statistici
+        </MudButton>
+        <MudButton Variant="Variant.Filled"
+                   StartIcon="@Icons.Custom.Uncategorized.Radioactive"
+                   Color="Color.Secondary"
+                   Class="ml-auto"
+                   @onclick="CuratareTextBox">
+            Resetează câmpul
+        </MudButton>
+    </div>
+</MudForm>
+
+@code {
+
+    private string _mesaj = string.Empty;
+
+    void ObtinereStatistici()
+    {
+        if (string.IsNullOrWhiteSpace(_mesaj))
+            return;
+
+        Statistici.ProcesareSursa(_mesaj);
+        NavManager.NavigateTo("statistici");
+    }
+
+    void CuratareTextBox()
+    {
+        _mesaj = "";
+    }
+
+}

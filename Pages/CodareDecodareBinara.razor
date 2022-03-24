@@ -1,0 +1,307 @@
+@page "/codare-decodare-binara"
+
+@inject HttpClient _http
+@inject StatisticiService _statistici
+@inject NavigationManager _navManager
+
+<PageTitle>Coder/Decoder Binar</PageTitle>
+<MudTabs Elevation="0" Rounded="true" PanelClass="pa-6" Align="center">
+    <MudTabPanel Text="Coder">
+        <MudGrid>
+            <MudItem xs="12" sm="6" Style="text-align:left;">
+                <MudMenu Label="Alegeti din sursele prestabilite" Variant="Variant.Outlined" Color="Color.Secondary" FullWidth="true" EndIcon="@Icons.Filled.ArrowDropDown" Class="mb-5">
+                    <MudMenuItem @onclick="@(() => ObtinereStatistici(Titluri.RASCOALA))">Liviu Rebreanu - Răscoala</MudMenuItem>
+                    <MudMenuItem @onclick="@(() => ObtinereStatistici(Titluri.VISUL))">W.S - Visul unei nopți de vară</MudMenuItem>
+                    <MudMenuItem @onclick="@(() => ObtinereStatistici(Titluri.LEGE))">Legea 50/1991</MudMenuItem>
+                    <MudMenuItem @onclick="@(() => ObtinereStatistici(Titluri.NEMATERIA))">Fuziunea Informatiei (Lucrare stiințifică)</MudMenuItem>
+                </MudMenu>
+                <MudTextField T="string" @bind-Value="_mesajTab1"
+                              Label="Introduceți mesajul"
+                              Variant="Variant.Outlined" Lines="9"/>
+                <MudCard Width="100%" Elevation="25" Height="270px" Class="mt-10 mb-10" Style="overflow-y: scroll; text-align: left;">
+                    <MudCardHeader>
+                        <MudText Typo="Typo.body1">Rezultatul codificării</MudText>
+                    </MudCardHeader>
+                    <MudDivider/>
+                    <MudCardContent Class="align-content-start" Style="overflow-wrap: break-word">
+                        <MudText>@_mesajCodat</MudText>
+                    </MudCardContent>
+                </MudCard>
+                <MudText Typo="Typo.body1" Class="mb-2">Sursa: @_titluText</MudText>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                @if (_titluText.Equals("-"))
+                {
+                    <MudPaper Class="d-flex justify-center align-content-center flex-wrap" Height="100%" Elevation="25" Outlined="true" Style="@($"background:{Colors.Grey.Lighten5}")">
+                        <MudText Typo="Typo.body1">Alegeți o sursă informațională prestabilită! </MudText><MudIcon Icon="@Icons.Outlined.Info" Color="Color.Default" Class="ml-2"/>
+                    </MudPaper>
+                }
+                else
+                {
+                    <MudTable Items="@_statistici.ListaStatistici"
+                              Hover="true"
+                              Striped="true"
+                              GroupFooterClass="mb-4">
+                        <HeaderContent>
+                            <MudTh>Index</MudTh>
+                            <MudTh>Caracter</MudTh>
+                            <MudTh>Probabilitate de apariție</MudTh>
+                            <MudTh>Cod Huffman</MudTh>
+                        </HeaderContent>
+                        <GroupHeaderTemplate>
+                        </GroupHeaderTemplate>
+                        <RowTemplate>
+                            <MudTd DataLabel="id" Class="clm-row-small">@context.ID</MudTd>
+                            <MudTd DataLabel="caracter">@context.CaracterAlfabet</MudTd>
+                            <MudTd DataLabel="probabilitateDeAparitie">@context.Probabilitate</MudTd>
+                            <MudTh DataLabel="codHuffman">@context.CodHuffman</MudTh>
+                        </RowTemplate>
+                        <PagerContent>
+                            <MudTablePager/>
+                        </PagerContent>
+                    </MudTable>
+                }
+
+            </MudItem>
+            <MudItem xs="12">
+                <div class="d-flex align-center justify-space-between mt-2">
+                    <MudButton Variant="Variant.Filled"
+                               EndIcon="@Icons.Material.Filled.Send"
+                               Color="Color.Primary"
+                               @onclick="Codificare"
+                               Disabled="@_disabled"
+                               Class="butoane">
+                        Codifică Mesajul
+                    </MudButton>
+
+                    <MudButton Variant="Variant.Filled"
+                               StartIcon="@Icons.Custom.Uncategorized.Radioactive"
+                               Color="Color.Secondary"
+                               Class="butoane"
+                               @onclick="ResetareCampuri">
+                        Resetează câmpurile
+                    </MudButton>
+                </div>
+            </MudItem>
+        </MudGrid>
+    </MudTabPanel>
+    <MudTabPanel Text="Decoder">
+        <MudGrid>
+            <MudItem xs="12" sm="6" Style="text-align:left;">
+                <MudMenu Label="Alegeti din sursele prestabilite" Variant="Variant.Outlined" Color="Color.Secondary" FullWidth="true" EndIcon="@Icons.Filled.ArrowDropDown" Class="mb-5">
+                    <MudMenuItem @onclick="@(() => ObtinereStatistici(Titluri.RASCOALA))">Liviu Rebreanu - Răscoala</MudMenuItem>
+                    <MudMenuItem @onclick="@(() => ObtinereStatistici(Titluri.VISUL))">W.S - Visul unei nopți de vară</MudMenuItem>
+                    <MudMenuItem @onclick="@(() => ObtinereStatistici(Titluri.LEGE))">Legea 50/1991</MudMenuItem>
+                    <MudMenuItem @onclick="@(() => ObtinereStatistici(Titluri.NEMATERIA))">Fuziunea Informatiei (Lucrare stiințifică)</MudMenuItem>
+                </MudMenu>
+                <MudTextField T="string" @bind-Value="_mesajTab2"
+                              Label="Introduceți mesajul"
+                              Variant="Variant.Outlined" Lines="9"/>
+                <MudCard Width="100%" Elevation="25" Height="270px" Class="mt-10 mb-10" Style="overflow-y: scroll; text-align: left;">
+                    <MudCardHeader>
+                        <MudText Typo="Typo.body1">Rezultatul decodificării</MudText>
+                    </MudCardHeader>
+                    <MudDivider/>
+                    <MudCardContent Class="align-content-start" Style="overflow-wrap: break-word">
+                        <MudText>@_mesajDecodat</MudText>
+                        <br/><br/>
+                        @if (_rest.Any())
+                        {
+                            <MudText Typo="Typo.body1" Class="mb-2">Rest rămas dupa schimbarea sursei informaționale: "@_rest"</MudText>
+                        }
+                    </MudCardContent>
+                </MudCard>
+
+                <MudText Typo="Typo.body1" Class="mb-2">Sursa: @_titluText</MudText>
+
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                @if (_titluText.Equals("-"))
+                {
+                    <MudPaper Class="d-flex justify-center align-content-center flex-wrap" Height="100%" Elevation="25" Outlined="true" Style="@($"background:{Colors.Grey.Lighten5}")">
+                        <MudText Typo="Typo.body1">Alegeți o sursă informațională prestabilită! </MudText><MudIcon Icon="@Icons.Outlined.Info" Color="Color.Default" Class="ml-2"/>
+                    </MudPaper>
+                }
+                else
+                {
+                    <MudTable Items="@_statistici.ListaStatistici"
+                              Hover="true"
+                              Striped="true"
+                              GroupFooterClass="mb-4">
+                        <HeaderContent>
+                            <MudTh>Index</MudTh>
+                            <MudTh>Caracter</MudTh>
+                            <MudTh>Probabilitate de apariție</MudTh>
+                            <MudTh>Cod Huffman</MudTh>
+                        </HeaderContent>
+                        <GroupHeaderTemplate>
+                        </GroupHeaderTemplate>
+                        <RowTemplate>
+                            <MudTd DataLabel="id" Class="clm-row-small">@context.ID</MudTd>
+                            <MudTd DataLabel="caracter">@context.CaracterAlfabet</MudTd>
+                            <MudTd DataLabel="probabilitateDeAparitie">@context.Probabilitate</MudTd>
+                            <MudTh DataLabel="codHuffman">@context.CodHuffman</MudTh>
+                        </RowTemplate>
+                        <PagerContent>
+                            <MudTablePager/>
+                        </PagerContent>
+                    </MudTable>
+                }
+
+            </MudItem>
+            <MudItem xs="12">
+                <div class="d-flex align-center justify-space-between mt-2">
+
+                    <MudButton Variant="Variant.Filled"
+                               EndIcon="@Icons.Material.Filled.Send"
+                               Color="Color.Primary"
+                               Class="butoane"
+                               Disabled="@_disabled"
+                               @onclick="Decodificare">
+                        Decodifică mesajul
+                    </MudButton>
+
+                    <MudButton Variant="Variant.Filled"
+                               StartIcon="@Icons.Custom.Uncategorized.Radioactive"
+                               Color="Color.Secondary"
+                               Class=" butoane"
+                               @onclick="ResetareCampuri">
+                        Resetează câmpurile
+                    </MudButton>
+                </div>
+            </MudItem>
+        </MudGrid>
+    </MudTabPanel>
+</MudTabs>
+
+@code {
+    private string _mesajTab1 = string.Empty;
+    private string _mesajTab2 = string.Empty;
+    private string _mesajCodat = string.Empty;
+    private string _mesajDecodat = string.Empty;
+    private string _textDeAnalizat = string.Empty;
+    private string _titluText = "-";
+    private string _rest = string.Empty;
+    private bool _disabled;
+
+    protected enum Titluri
+    {
+        RASCOALA,
+        VISUL,
+        NEMATERIA,
+        LEGE
+    }
+
+    protected async Task ObtinereStatistici(Titluri titluri)
+    {
+        switch (titluri)
+        {
+            case Titluri.RASCOALA:
+            {
+                _textDeAnalizat = await _http.GetStringAsync("sample-data/Liviu_Rebreanu_Rascoala.txt");
+                _titluText = "Liviu R. - Răscoala";
+
+                break;
+            }
+            case Titluri.VISUL:
+            {
+                _textDeAnalizat = await _http.GetStringAsync("sample-data/Shakespeare_Visul_unei_nopti_de_vara.txt");
+                _titluText = "William Shakespeare - Visul unei nopți de vară";
+                break;
+            }
+            case Titluri.LEGE:
+            {
+                _textDeAnalizat = await _http.GetStringAsync("sample-data/Legea_50-1991.txt");
+                _titluText = "Legea nr. 50/1991 privind autorizarea executării lucrărilor de construcții";
+                break;
+            }
+            case Titluri.NEMATERIA:
+            {
+                _textDeAnalizat = await _http.GetStringAsync("sample-data/Fuziunea_Informatiei(Lucrare_Stiintifica).txt");
+                _titluText = "Fuziunea Informației (Lucrare Științifică)";
+                break;
+            }
+        }
+        _statistici = new();
+        if (string.IsNullOrWhiteSpace(_textDeAnalizat))
+            return;
+
+        if (!_titluText.Equals("-"))
+        {
+            _disabled = false;
+        }
+
+        _statistici.ProcesareSursa(_textDeAnalizat);
+    }
+
+    private void Codificare()
+    {
+        if (_titluText.Equals("-"))
+        {
+            _disabled = true;
+            return;
+        }
+        _mesajCodat = string.Empty;
+        _mesajTab1 = _mesajTab1.ToLower();
+        foreach (var caracter in _mesajTab1)
+        {
+            if (char.IsWhiteSpace(caracter))
+                _mesajCodat += _statistici.ListaStatistici[19].CodHuffman;
+
+            foreach (var elem in _statistici.ListaStatistici)
+            {
+                if (caracter == elem.CaracterAlfabet && char.IsLetter(caracter))
+                {
+                    _mesajCodat += elem.CodHuffman;
+                }
+            }
+        }
+    }
+
+    private void Decodificare()
+    {
+        if (_titluText.Equals("-"))
+        {
+            _disabled = true;
+            return;
+        }
+        
+        _mesajDecodat = string.Empty;
+        string temp = _mesajTab2;
+
+        bool ok = true;
+        while (temp.Length > 0 && ok)
+        {
+            ok = false;
+            foreach (var element in _statistici.ListaStatistici)
+            {
+                if (element.CodHuffman != null && temp.StartsWith(element.CodHuffman))
+                {
+                    if (element.CaracterAlfabet == 'q')
+                    {
+                        _mesajDecodat += ' ';
+                    }
+                    else
+                    {
+                        _mesajDecodat += element.CaracterAlfabet;
+                    }
+                    temp = temp.Remove(0, element.CodHuffman.Length);
+                    ok = true;
+                }
+            }
+        }
+
+        _rest = temp;
+    }
+
+    private void ResetareCampuri()
+    {
+        _statistici = new();
+        _mesajTab1 = string.Empty;
+        _mesajTab2 = string.Empty;
+        _mesajCodat = string.Empty;
+        _mesajDecodat = string.Empty;
+        _titluText = "-";
+    }
+
+}
